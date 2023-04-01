@@ -1,4 +1,5 @@
 import 'package:ecommerce_app/src/features/shopping_cart/shopping_cart_screen.dart';
+import 'package:ecommerce_app/src/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:ecommerce_app/src/constants/app_sizes.dart';
 import 'package:go_router/go_router.dart';
@@ -20,7 +21,16 @@ class ShoppingCartIcon extends StatelessWidget {
           child: IconButton(
             key: shoppingCartIconKey,
             icon: const Icon(Icons.shopping_cart),
-            onPressed: () => GoRouter.of(context).go('/cart'),
+            onPressed: () => context.goNamed(AppRoute.home.name),
+
+            ///
+            //onPressed: () => GoRouter.of(context).go('/cart'),
+            // *GoRouter introduces a BuildContext Extension.
+            // *If we cmd+click on [go] function below, we will be able to see that
+            // *we have a GoRouter Helper extension on BuildContext and that
+            // *defines all the different methods such as go, goNamed, push, pushNamed and pop.
+            /// To save time, we will use this extension
+            //onPressed: () => context.go('/cart'),
             // onPressed: () => Navigator.of(context).push(
             //   MaterialPageRoute(
             //     fullscreenDialog: true,
