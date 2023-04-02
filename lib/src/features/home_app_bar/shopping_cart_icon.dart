@@ -1,6 +1,7 @@
-import 'package:ecommerce_app/src/features/shopping_cart/shopping_cart_screen.dart';
+import 'package:ecommerce_app/src/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:ecommerce_app/src/constants/app_sizes.dart';
+import 'package:go_router/go_router.dart';
 
 /// Shopping cart icon with items count badge
 class ShoppingCartIcon extends StatelessWidget {
@@ -19,12 +20,28 @@ class ShoppingCartIcon extends StatelessWidget {
           child: IconButton(
             key: shoppingCartIconKey,
             icon: const Icon(Icons.shopping_cart),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                fullscreenDialog: true,
-                builder: (_) => const ShoppingCartScreen(),
-              ),
-            ),
+            onPressed: () => context.pushNamed(AppRoute.cart.name),
+
+            /// This will add Shopping Cart Page in the stack rather than going to it so if we hit the
+            /// back arrow key then we will be able to see the previous page and not the home page.
+            /// With goNamed we were sent back to home page only.
+            ///
+            //onPressed: () => context.goNamed(AppRoute.cart.name),
+
+            ///
+            //onPressed: () => GoRouter.of(context).go('/cart'),
+            // *GoRouter introduces a BuildContext Extension.
+            // *If we cmd+click on [go] function below, we will be able to see that
+            // *we have a GoRouter Helper extension on BuildContext and that
+            // *defines all the different methods such as go, goNamed, push, pushNamed and pop.
+            /// To save time, we will use this extension
+            //onPressed: () => context.go('/cart'),
+            // onPressed: () => Navigator.of(context).push(
+            //   MaterialPageRoute(
+            //     fullscreenDialog: true,
+            //     builder: (_) => const ShoppingCartScreen(),
+            //   ),
+            // ),
           ),
         ),
         if (cartItemsCount > 0)

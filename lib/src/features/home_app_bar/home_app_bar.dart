@@ -5,10 +5,12 @@ import 'package:ecommerce_app/src/features/sign_in/email_password_sign_in_screen
 import 'package:ecommerce_app/src/features/sign_in/email_password_sign_in_state.dart';
 import 'package:ecommerce_app/src/localization/string_hardcoded.dart';
 import 'package:ecommerce_app/src/models/app_user.dart';
+import 'package:ecommerce_app/src/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:ecommerce_app/src/common_widgets/action_text_button.dart';
 import 'package:ecommerce_app/src/features/home_app_bar/more_menu_button.dart';
 import 'package:ecommerce_app/src/features/home_app_bar/shopping_cart_icon.dart';
+import 'package:go_router/go_router.dart';
 
 /// Custom [AppBar] widget that is reused by the [ProductsListScreen] and
 /// [ProductScreen].
@@ -23,6 +25,12 @@ class HomeAppBar extends StatelessWidget with PreferredSizeWidget {
   Widget build(BuildContext context) {
     // TODO: get user from auth repository
     const user = AppUser(uid: '123', email: 'test@test.com');
+
+    /// To test the signIn functionality, as the user
+    /// value will be null in this case. Sign In prompt will appear.
+    ///
+    // const user = null;
+    ///
     // * This widget is responsive.
     // * On large screen sizes, it shows all the actions in the app bar.
     // * On small screen sizes, it shows only the shopping cart icon and a
@@ -48,35 +56,50 @@ class HomeAppBar extends StatelessWidget with PreferredSizeWidget {
             ActionTextButton(
               key: MoreMenuButton.ordersKey,
               text: 'Orders'.hardcoded,
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  fullscreenDialog: true,
-                  builder: (_) => const OrdersListScreen(),
-                ),
-              ),
+              onPressed: () => context.pushNamed(AppRoute.orders.name),
+
+              ///
+              //onPressed: () => context.go('/orders'),
+              ///
+              // onPressed: () => Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     fullscreenDialog: true,
+              //     builder: (_) => const OrdersListScreen(),
+              //   ),
+              // ),
             ),
             ActionTextButton(
               key: MoreMenuButton.accountKey,
               text: 'Account'.hardcoded,
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  fullscreenDialog: true,
-                  builder: (_) => const AccountScreen(),
-                ),
-              ),
+
+              /// push will keep current stack and add one page
+              /// using pushNamed rather than goNamed
+              onPressed: () => context.pushNamed(AppRoute.account.name),
+
+              /// go will modify the underlying navigation stack if the new route is not a sub-route of the old one
+              /// [go to target destination, discarding current stack]
+              //onPressed: () => context.go('/account'),
+              // onPressed: () => Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     fullscreenDialog: true,
+              //     builder: (_) => const AccountScreen(),
+              //   ),
+              // ),
             ),
           ] else
             ActionTextButton(
               key: MoreMenuButton.signInKey,
               text: 'Sign In'.hardcoded,
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  fullscreenDialog: true,
-                  builder: (_) => const EmailPasswordSignInScreen(
-                    formType: EmailPasswordSignInFormType.signIn,
-                  ),
-                ),
-              ),
+              onPressed: () => context.pushNamed(AppRoute.signIn.name),
+              //onPressed: () => context.go('/signIn'),
+              // onPressed: () => Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     fullscreenDialog: true,
+              //     builder: (_) => const EmailPasswordSignInScreen(
+              //       formType: EmailPasswordSignInFormType.signIn,
+              //     ),
+              //   ),
+              // ),
             )
         ],
       );
