@@ -29,7 +29,7 @@ final goRouter = GoRouter(
   /// Enable Debugging Logs for GoRouter [all the navigation events will be logged to the debug console]
   // debugLogDiagnostics: true,
 
-  debugLogDiagnostics: true,
+  debugLogDiagnostics: false,
   routes: [
     GoRoute(
         path: '/',
