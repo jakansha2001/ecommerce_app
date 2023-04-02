@@ -1,4 +1,3 @@
-import 'package:ecommerce_app/src/features/shopping_cart/shopping_cart_screen.dart';
 import 'package:ecommerce_app/src/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:ecommerce_app/src/constants/app_sizes.dart';
@@ -21,7 +20,13 @@ class ShoppingCartIcon extends StatelessWidget {
           child: IconButton(
             key: shoppingCartIconKey,
             icon: const Icon(Icons.shopping_cart),
-            onPressed: () => context.goNamed(AppRoute.home.name),
+            onPressed: () => context.pushNamed(AppRoute.cart.name),
+
+            /// This will add Shopping Cart Page in the stack rather than going to it so if we hit the
+            /// back arrow key then we will be able to see the previous page and not the home page.
+            /// With goNamed we were sent back to home page only.
+            ///
+            //onPressed: () => context.goNamed(AppRoute.cart.name),
 
             ///
             //onPressed: () => GoRouter.of(context).go('/cart'),
