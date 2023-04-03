@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:ecommerce_app/src/constants/test_products.dart';
+import 'package:ecommerce_app/src/features/products/data/fake_products_repository.dart';
 import 'package:ecommerce_app/src/localization/string_hardcoded.dart';
 import 'package:ecommerce_app/src/routing/app_router.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,10 @@ class ProductsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: Read from data source
-    const products = kTestProducts;
+
+    /// This will only use the current instance and not create multiple instances of FakeProductsRepository (using as Singleton)
+    final products = FakeProductsRepository.instance.getProductsList();
+    //const products = kTestProducts;
     return products.isEmpty
         ? Center(
             child: Text(
