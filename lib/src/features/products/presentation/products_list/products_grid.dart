@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:ecommerce_app/src/common_widgets/error_message_widget.dart';
 import 'package:ecommerce_app/src/constants/test_products.dart';
 import 'package:ecommerce_app/src/features/products/data/fake_products_repository.dart';
 import 'package:ecommerce_app/src/localization/string_hardcoded.dart';
@@ -18,39 +19,57 @@ class ProductsGrid extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // // TODO: Read from data source
-    final productsRepository = ref.watch(productsRepositoryProvider);
-    final products = productsRepository.getProductsList();
+
+    /// When we call ref.watch(<StreamProvider>) on a StreamProvider our [ProductGrid] widget will rebuild everytime the stream emits a 
+    /// new value. And beause streams emit Asynchronous data then we must hande 3 different cases called data, error and loading
+    /// and riverpod gives us a Async Value type that makes it easy to map these 3 cases to different widgets and it does so in a compile safe way
+    /// making it impossible to forget the loading and error state
+    // final productsListValue = ref.watch(productsListStreamProvider);
+    final productsListValue = ref.watch(productsListFutureProvider);
+    return productsListValue.when(
+      data: (products) => products.isEmpty
+          ? Center(
+              child: Text(
+                'No products found'.hardcoded,
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+            )
+          : ProductsLayoutGrid(
+              itemCount: products.length,
+              itemBuilder: (_, index) {
+                final product = products[index];
+                return ProductCard(
+                  product: product,
+                  onPressed: () => context.goNamed(
+                    AppRoute.product.name,
+                    params: {
+                      'id': product.id,
+                    },
+                  ),
+                );
+              },
+            ),
+      error: (Object error, StackTrace stackTrace) => Center(
+        child: ErrorMessageWidget(
+          error.toString(),
+        ),
+      ),
+      loading: () => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+    // final productsRepository = ref.watch(productsRepositoryProvider);
+    // final products = productsRepository.getProductsList();
 
     /// This will only use the current instance and not create multiple instances of FakeProductsRepository (using as Singleton)
     //final products = FakeProductsRepository.instance.getProductsList();
     //const products = kTestProducts;
-    return products.isEmpty
-        ? Center(
-            child: Text(
-              'No products found'.hardcoded,
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          )
-        : ProductsLayoutGrid(
-            itemCount: products.length,
-            itemBuilder: (_, index) {
-              final product = products[index];
-              return ProductCard(
-                product: product,
-                onPressed: () => context.goNamed(
-                  AppRoute.product.name,
-                  params: {
-                    'id': product.id,
-                  },
-                ),
-                // onPressed: () => Navigator.of(context).push(
-                //   MaterialPageRoute(
-                //     builder: (_) => ProductScreen(productId: product.id),
-                //   ),
-                // ),
-              );
-            },
-          );
+
+    // onPressed: () => Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (_) => ProductScreen(productId: product.id),
+    //   ),
+    // ),
   }
 }
 

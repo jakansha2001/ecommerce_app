@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Singleton Class (Should not use it a lot as it makes our widgets hard to test)
 class FakeProductsRepository {
-  FakeProductsRepository._(); //private constructor (Can have only 1 instance throughout)
-  static FakeProductsRepository instance = FakeProductsRepository._();
+  // FakeProductsRepository._(); //private constructor (Can have only 1 instance throughout)
+  // static FakeProductsRepository instance = FakeProductsRepository._();
 
   final List<Product> _products = kTestProducts;
 
@@ -32,5 +32,16 @@ class FakeProductsRepository {
 }
 
 final productsRepositoryProvider = Provider<FakeProductsRepository>((ref) {
-  return FakeProductsRepository.instance;
+  return FakeProductsRepository();
+  // return FakeProductsRepository.instance;
+});
+
+final productsListStreamProvider = StreamProvider<List<Product>>((ref) {
+  final productsRepository = ref.watch(productsRepositoryProvider);
+  return productsRepository.watchProductsList();
+});
+
+final productsListFutureProvider = FutureProvider<List<Product>>((ref) {
+  final productsRepository = ref.watch(productsRepositoryProvider);
+  return productsRepository.fetchProductsList();
 });
