@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:ecommerce_app/src/common_widgets/async_value_widget.dart';
 import 'package:ecommerce_app/src/common_widgets/error_message_widget.dart';
 import 'package:ecommerce_app/src/constants/test_products.dart';
 import 'package:ecommerce_app/src/features/products/data/fake_products_repository.dart';
@@ -20,13 +21,16 @@ class ProductsGrid extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // // TODO: Read from data source
 
-    /// When we call ref.watch(<StreamProvider>) on a StreamProvider our [ProductGrid] widget will rebuild everytime the stream emits a 
+    /// When we call ref.watch(<StreamProvider>) on a StreamProvider our [ProductGrid] widget will rebuild everytime the stream emits a
     /// new value. And beause streams emit Asynchronous data then we must hande 3 different cases called data, error and loading
     /// and riverpod gives us a Async Value type that makes it easy to map these 3 cases to different widgets and it does so in a compile safe way
     /// making it impossible to forget the loading and error state
+    /// Summary: Whenever we have an Async Value and we need to return a widget inside the build() then we can use the when() and specify
+    /// the data, error and loading callbacks
     // final productsListValue = ref.watch(productsListStreamProvider);
     final productsListValue = ref.watch(productsListFutureProvider);
-    return productsListValue.when(
+    return AsyncValueWidget(
+      value: productsListValue,
       data: (products) => products.isEmpty
           ? Center(
               child: Text(
@@ -49,14 +53,6 @@ class ProductsGrid extends ConsumerWidget {
                 );
               },
             ),
-      error: (Object error, StackTrace stackTrace) => Center(
-        child: ErrorMessageWidget(
-          error.toString(),
-        ),
-      ),
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
-      ),
     );
     // final productsRepository = ref.watch(productsRepositoryProvider);
     // final products = productsRepository.getProductsList();

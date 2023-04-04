@@ -1,3 +1,4 @@
+import 'package:ecommerce_app/src/common_widgets/async_value_widget.dart';
 import 'package:ecommerce_app/src/common_widgets/error_message_widget.dart';
 import 'package:ecommerce_app/src/constants/test_products.dart';
 import 'package:ecommerce_app/src/features/products/data/fake_products_repository.dart';
@@ -62,22 +63,22 @@ class ProductScreen extends StatelessWidget {
       body: Consumer(
         builder: (context, ref, _) {
           final productValue = ref.watch(productProvider(productId));
-          return productValue.when(
-              data: (product) => product == null
-                  ? EmptyPlaceholderWidget(
-                      message: 'Product not found'.hardcoded,
-                    )
-                  : CustomScrollView(
-                      slivers: [
-                        ResponsiveSliverCenter(
-                          padding: const EdgeInsets.all(Sizes.p16),
-                          child: ProductDetails(product: product),
-                        ),
-                        ProductReviewsList(productId: productId),
-                      ],
-                    ),
-              error: (e, st) => Center(child: ErrorMessageWidget(e.toString())),
-              loading: () => const Center(child: CircularProgressIndicator()));
+          return AsyncValueWidget(
+            value: productValue,
+            data: (product) => product == null
+                ? EmptyPlaceholderWidget(
+                    message: 'Product not found'.hardcoded,
+                  )
+                : CustomScrollView(
+                    slivers: [
+                      ResponsiveSliverCenter(
+                        padding: const EdgeInsets.all(Sizes.p16),
+                        child: ProductDetails(product: product),
+                      ),
+                      ProductReviewsList(productId: productId),
+                    ],
+                  ),
+          );
           // final productsRepository = ref.watch(productsRepositoryProvider);
           // final product = productsRepository.getProduct(productId);
         },
