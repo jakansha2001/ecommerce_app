@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:ecommerce_app/src/common_widgets/async_value_widget.dart';
+import 'package:ecommerce_app/src/common_widgets/error_message_widget.dart';
 import 'package:ecommerce_app/src/constants/test_products.dart';
 import 'package:ecommerce_app/src/features/products/data/fake_products_repository.dart';
 import 'package:ecommerce_app/src/localization/string_hardcoded.dart';
@@ -8,46 +10,62 @@ import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:ecommerce_app/src/constants/app_sizes.dart';
 import 'package:ecommerce_app/src/features/products/presentation/products_list/product_card.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// A widget that displays the list of products that match the search query.
-class ProductsGrid extends StatelessWidget {
+class ProductsGrid extends ConsumerWidget {
   const ProductsGrid({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // TODO: Read from data source
+  Widget build(BuildContext context, WidgetRef ref) {
+    // // TODO: Read from data source
+
+    /// When we call ref.watch(<StreamProvider>) on a StreamProvider our [ProductGrid] widget will rebuild everytime the stream emits a
+    /// new value. And beause streams emit Asynchronous data then we must hande 3 different cases called data, error and loading
+    /// and riverpod gives us a Async Value type that makes it easy to map these 3 cases to different widgets and it does so in a compile safe way
+    /// making it impossible to forget the loading and error state
+    /// Summary: Whenever we have an Async Value and we need to return a widget inside the build() then we can use the when() and specify
+    /// the data, error and loading callbacks
+    // final productsListValue = ref.watch(productsListStreamProvider);
+    final productsListValue = ref.watch(productsListFutureProvider);
+    return AsyncValueWidget(
+      value: productsListValue,
+      data: (products) => products.isEmpty
+          ? Center(
+              child: Text(
+                'No products found'.hardcoded,
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+            )
+          : ProductsLayoutGrid(
+              itemCount: products.length,
+              itemBuilder: (_, index) {
+                final product = products[index];
+                return ProductCard(
+                  product: product,
+                  onPressed: () => context.goNamed(
+                    AppRoute.product.name,
+                    params: {
+                      'id': product.id,
+                    },
+                  ),
+                );
+              },
+            ),
+    );
+    // final productsRepository = ref.watch(productsRepositoryProvider);
+    // final products = productsRepository.getProductsList();
 
     /// This will only use the current instance and not create multiple instances of FakeProductsRepository (using as Singleton)
-    final products = FakeProductsRepository.instance.getProductsList();
+    //final products = FakeProductsRepository.instance.getProductsList();
     //const products = kTestProducts;
-    return products.isEmpty
-        ? Center(
-            child: Text(
-              'No products found'.hardcoded,
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          )
-        : ProductsLayoutGrid(
-            itemCount: products.length,
-            itemBuilder: (_, index) {
-              final product = products[index];
-              return ProductCard(
-                product: product,
-                onPressed: () => context.goNamed(
-                  AppRoute.product.name,
-                  params: {
-                    'id': product.id,
-                  },
-                ),
-                // onPressed: () => Navigator.of(context).push(
-                //   MaterialPageRoute(
-                //     builder: (_) => ProductScreen(productId: product.id),
-                //   ),
-                // ),
-              );
-            },
-          );
+
+    // onPressed: () => Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (_) => ProductScreen(productId: product.id),
+    //   ),
+    // ),
   }
 }
 

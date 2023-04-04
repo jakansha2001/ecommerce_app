@@ -1,3 +1,5 @@
+import 'package:ecommerce_app/src/common_widgets/async_value_widget.dart';
+import 'package:ecommerce_app/src/common_widgets/error_message_widget.dart';
 import 'package:ecommerce_app/src/constants/test_products.dart';
 import 'package:ecommerce_app/src/features/products/data/fake_products_repository.dart';
 import 'package:ecommerce_app/src/localization/string_hardcoded.dart';
@@ -14,31 +16,73 @@ import 'package:ecommerce_app/src/features/products/presentation/product_screen/
 import 'package:ecommerce_app/src/features/products/presentation/product_screen/product_average_rating.dart';
 import 'package:ecommerce_app/src/features/reviews/presentation/product_reviews/product_reviews_list.dart';
 import 'package:ecommerce_app/src/features/products/domain/product.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Shows the product page for a given product ID.
+// Shows the product page for a given product ID.
+// *Using ConsumerWidget  (everything in the build method will rebuild if the provider value changes -> performance issue)
+// class ProductScreen extends ConsumerWidget {
+//   const ProductScreen({super.key, required this.productId});
+//   final String productId;
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     // // TODO: Read from data source
+//     final productsRepository = ref.watch(productsRepositoryProvider);
+//     final product = productsRepository.getProduct(productId);
+//     // final product = FakeProductsRepository.instance.getProduct(productId);
+//     return Scaffold(
+//       appBar: const HomeAppBar(),
+//       body: product == null
+//           ? EmptyPlaceholderWidget(
+//               message: 'Product not found'.hardcoded,
+//             )
+//           : CustomScrollView(
+//               slivers: [
+//                 ResponsiveSliverCenter(
+//                   padding: const EdgeInsets.all(Sizes.p16),
+//                   child: ProductDetails(product: product),
+//                 ),
+//                 ProductReviewsList(productId: productId),
+//               ],
+//             ),
+//     );
+//   }
+// }
+// *Using Consumer  (Only code inside the builder will rebuild)
 class ProductScreen extends StatelessWidget {
   const ProductScreen({super.key, required this.productId});
   final String productId;
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Read from data source
-    final product = FakeProductsRepository.instance.getProduct(productId);
+    // // TODO: Read from data source
+
+    // final product = FakeProductsRepository.instance.getProduct(productId);
     return Scaffold(
       appBar: const HomeAppBar(),
-      body: product == null
-          ? EmptyPlaceholderWidget(
-              message: 'Product not found'.hardcoded,
-            )
-          : CustomScrollView(
-              slivers: [
-                ResponsiveSliverCenter(
-                  padding: const EdgeInsets.all(Sizes.p16),
-                  child: ProductDetails(product: product),
-                ),
-                ProductReviewsList(productId: productId),
-              ],
-            ),
+      body: Consumer(
+        builder: (context, ref, _) {
+          final productValue = ref.watch(productProvider(productId));
+          return AsyncValueWidget(
+            value: productValue,
+            data: (product) => product == null
+                ? EmptyPlaceholderWidget(
+                    message: 'Product not found'.hardcoded,
+                  )
+                : CustomScrollView(
+                    slivers: [
+                      ResponsiveSliverCenter(
+                        padding: const EdgeInsets.all(Sizes.p16),
+                        child: ProductDetails(product: product),
+                      ),
+                      ProductReviewsList(productId: productId),
+                    ],
+                  ),
+          );
+          // final productsRepository = ref.watch(productsRepositoryProvider);
+          // final product = productsRepository.getProduct(productId);
+        },
+      ),
     );
   }
 }
