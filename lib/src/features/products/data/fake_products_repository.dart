@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:ecommerce_app/src/constants/test_products.dart';
 import 'package:ecommerce_app/src/features/products/domain/product.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Singleton Class (Should not use it a lot as it makes our widgets hard to test)
@@ -56,19 +59,34 @@ final productsRepositoryProvider = Provider<FakeProductsRepository>((ref) {
   // return FakeProductsRepository.instance;
 });
 
-final productsListStreamProvider = StreamProvider<List<Product>>((ref) {
+final productsListStreamProvider =
+    StreamProvider.autoDispose<List<Product>>((ref) {
+  // debugPrint('Created productsListStreamProvider');
   final productsRepository = ref.watch(productsRepositoryProvider);
   return productsRepository.watchProductsList();
 });
 
-final productsListFutureProvider = FutureProvider<List<Product>>((ref) {
+final productsListFutureProvider =
+    FutureProvider.autoDispose<List<Product>>((ref) {
   final productsRepository = ref.watch(productsRepositoryProvider);
   return productsRepository.fetchProductsList();
 });
 
 /// family modifier (used to pass a runtime argument to a provider)
 
-final productProvider = StreamProvider.family<Product?, String>((ref, id) {
+final productProvider =
+    StreamProvider.autoDispose.family<Product?, String>((ref, id) {
+  // debugPrint('Created productProvider with id: $id');
+  // ref.onDispose(() => debugPrint('disposed productProvider'));
+  // final link = ref.keepAlive();
+  // Timer(
+  //     const Duration(seconds: 10),
+  //     () => link
+  //         .close()); //KeepAliveLink + Timer allow us to implement a "cache with timeout" policy
+  // useful when we have a list of items that we want to cache for a certain period of time.
+  /// autoDispose will dispose the provider immediately but this should not be the case, everytime new stream connection will be established
+  /// and will cost us so daata caching option will help
+
   final productsRepository = ref.watch(productsRepositoryProvider);
   return productsRepository.watchProduct(id);
 });
