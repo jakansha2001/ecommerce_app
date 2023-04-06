@@ -65,7 +65,10 @@ class FirebaseAuthRepository implements AuthRepository {
 }
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return FakeAuthRepository();
+  // Run with this command:
+  // flutter run --dart-define=useFakeRepos=true/false
+  const isFake = String.fromEnvironment('useFakeRepos') == 'true';
+  return isFake ? FakeAuthRepository() : FirebaseAuthRepository();
 });
 
 final authStateChangesProvider = StreamProvider.autoDispose<AppUser?>((ref) {
