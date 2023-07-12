@@ -1,12 +1,13 @@
 import 'package:ecommerce_app/src/features/authentication/data/fake_auth_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AccountScreenController extends StateNotifier<AsyncValue> {
+class AccountScreenController extends StateNotifier<AsyncValue<void>> {
   /// Always declare StateNotifier with a type (in this case, AsyncValue<void>)
   /// Always pass an initial value in the constructor
 
 // AsyncValue<void>.data(null) means not loading
   AccountScreenController({required this.authRepository}) : super(const AsyncValue.data(null));
+  // AsyncValue.data() is same as AsyncData
 
   final FakeAuthRepository authRepository;
 
@@ -26,14 +27,18 @@ class AccountScreenController extends StateNotifier<AsyncValue> {
     //   return false;
     // }
 
-    state = const AsyncValue.loading(); // Because we always need to set the state to Loading
+    // AsyncValue.loading() is same as AsyncLoading
+    // AsyncValue.error() is same as AsyncError
+    // AsyncData, AsyncLoading and AsyncError are all subclasses of AsyncValue
+    state = const AsyncValue<void>.loading(); // Because we always need to set the state to Loading
     state = await AsyncValue.guard(() => authRepository
         .signOut()); // The 'state' here will contain data or error depending upon whether this future [authRepository.signOut()] succeeds or not
     //return state.hasError == false; // This should be true is state.hasError == false
   }
 }
 
-final accountScreenControllerProvider = StateNotifierProvider<AccountScreenController, AsyncValue>((ref) {
+final accountScreenControllerProvider =
+    StateNotifierProvider<AccountScreenController, AsyncValue<void>>((ref) {
   final authRepository = ref.watch(authRepositoryProvider);
   return AccountScreenController(authRepository: authRepository);
 });
