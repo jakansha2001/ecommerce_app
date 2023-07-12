@@ -4,20 +4,23 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('FakeAuthRepository Tests', () {
-    final testEmail = 'test@test.com';
-    final testPassword = '1234';
+    const testEmail = 'test@test.com';
+    const testPassword = '1234';
     final testUser = AppUser(uid: testEmail.split('').reversed.join(), email: testEmail);
     FakeAuthRepository makeAuthRepository = FakeAuthRepository(addDelay: false);
     // Test case to check current user is null when we create FakeAuthRepository
     test('current user is null', () {
       //final authRepository = FakeAuthRepository();
       final authRepository = makeAuthRepository;
+      // this will be called even if the test fails
+      addTearDown(authRepository.dispose);
       expect(authRepository.currentUser, null);
       expect(authRepository.authStateChanges(), emits(null));
     });
 
     test('current user is not null after sign in', () async {
       final authRepository = makeAuthRepository;
+      addTearDown(authRepository.dispose);
       // first let's sign in then expect(actual,matcher)
       await authRepository.signInWithEmailAndPassword(testEmail, testPassword);
       expect(
@@ -33,6 +36,7 @@ void main() {
 
     test('current user is not null after registration', () async {
       final authRepository = makeAuthRepository;
+      addTearDown(authRepository.dispose);
       // first let's sign in then expect(actual,matcher)
       await authRepository.createUserWithEmailAndPassword(testEmail, testPassword);
       expect(
@@ -70,6 +74,7 @@ void main() {
     // });
     test('current user is null after sign out', () async {
       final authRepository = makeAuthRepository;
+      addTearDown(authRepository.dispose);
       //  Signing in the user to  make sure we  get a non null user
       await authRepository.signInWithEmailAndPassword(testEmail, testPassword);
       expect(
